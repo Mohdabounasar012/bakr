@@ -1,0 +1,46 @@
+name: S3 Operations
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  s3_operations:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout the repository's code
+      - name: Checkout code
+        uses: actions/checkout@main
+
+      # Set up AWS CLI
+      - name: configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1  # Specify your region here
+
+      # List all S3 buckets
+      - name: List all S3 Buckets
+        run: |
+          aws s3 ls
+
+      # Create a new S3 bucket
+      - name: Create new S3 Bucket
+        run: |
+          aws s3 mb s3://my-new-bucket-$(date +%s)  # Create a bucket with a unique name
+
+      # Upload a file to the S3 bucket
+      - name: Upload file to S3
+        run: |
+          echo "This is a sample file content" > index.html  # Create a sample file
+          aws s3 cp index.html s3://my-new-bucket-$(date +%s)/index.html  # Upload file to the new bucket
+
+      # Optionally, you can delete the file or bucket if needed after testing
+      - name: Clean up S3 bucket
+        run: |
+          aws s3 rm s3://my-new-bucket-$(date +%s)/index.html
+          aws s3 rb s3://my-new-bucket-$(date +%s) --force  # Remove bucket and its contents
+
