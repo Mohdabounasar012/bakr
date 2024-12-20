@@ -1,4 +1,4 @@
-name: S3 Operations
+name: deploy
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  s3_operations:
+  deploy:
     runs-on: ubuntu-latest
     
     steps:
