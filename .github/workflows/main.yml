@@ -44,9 +44,3 @@ jobs:
         run: |
           echo "This is a sample file content" > index.html  # Create a sample file
           aws s3 cp index.html s3://$BUCKET_NAME/index.html  # Upload file to the bucket
-
-      # Optionally, clean up the S3 bucket
-      - name: Clean up S3 bucket
-        run: |
-          aws s3 rm s3://$BUCKET_NAME/index.html
-          aws s3 rb s3://$BUCKET_NAME --force  # Remove bucket and its contents
