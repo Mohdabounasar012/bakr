@@ -41,6 +41,7 @@ jobs:
       # Upload a file to the existing or newly created S3 bucket
       - name: Upload file to S3
         run: |
+          BUCKET_NAME="mohd-github"  # Explicitly set bucket name here
           echo "This is a sample file content" > index.html  # Create a sample file
           aws s3 cp index.html s3://$BUCKET_NAME/index.html  # Upload file to the bucket
 
