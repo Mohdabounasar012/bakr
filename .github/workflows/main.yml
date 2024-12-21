@@ -30,18 +30,18 @@ jobs:
       # Check if the S3 bucket exists, create if not
       - name: Ensure S3 Bucket Exists
         run: |
-          BUCKET_NAME="mohd-github"
+          export BUCKET_NAME="mohd-github"  # Explicitly set bucket name
           if ! aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
             echo "Bucket exists: $BUCKET_NAME"
           else
             echo "Bucket does not exist, creating: $BUCKET_NAME"
             aws s3 mb s3://$BUCKET_NAME
           fi
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV  # Save bucket name as environment variable
 
       # Upload a file to the existing or newly created S3 bucket
       - name: Upload file to S3
         run: |
-          BUCKET_NAME="mohd-github"  # Explicitly set bucket name here
           echo "This is a sample file content" > index.html  # Create a sample file
           aws s3 cp index.html s3://$BUCKET_NAME/index.html  # Upload file to the bucket
 
