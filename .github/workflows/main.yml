@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@main
 
       # Set up AWS CLI
-      - name: configure-aws-credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@main
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -27,20 +27,25 @@ jobs:
         run: |
           aws s3 ls
 
-      # Create a new S3 bucket
-      - name: Create new S3 Bucket
+      # Check if the S3 bucket exists, create if not
+      - name: Ensure S3 Bucket Exists
         run: |
-          aws s3 mb s3://my-new-bucket-$(date +%s)  # Create a bucket with a unique name
+          BUCKET_NAME="mohd-github"
+          if ! aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
+            echo "Bucket exists: $BUCKET_NAME"
+          else
+            echo "Bucket does not exist, creating: $BUCKET_NAME"
+            aws s3 mb s3://$BUCKET_NAME
+          fi
 
-      # Upload a file to the S3 bucket
+      # Upload a file to the existing or newly created S3 bucket
       - name: Upload file to S3
         run: |
           echo "This is a sample file content" > index.html  # Create a sample file
-          aws s3 cp index.html s3://my-new-bucket-$(date +%s)/index.html  # Upload file to the new bucket
+          aws s3 cp index.html s3://$BUCKET_NAME/index.html  # Upload file to the bucket
 
-      # Optionally, you can delete the file or bucket if needed after testing
+      # Optionally, clean up the S3 bucket
       - name: Clean up S3 bucket
         run: |
-          aws s3 rm s3://my-new-bucket-$(date +%s)/index.html
-          aws s3 rb s3://my-new-bucket-$(date +%s) --force  # Remove bucket and its contents
-
+          aws s3 rm s3://$BUCKET_NAME/index.html
+          aws s3 rb s3://$BUCKET_NAME --force  # Remove bucket and its contents
